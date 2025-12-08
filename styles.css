@@ -213,6 +213,7 @@ main {
 
 .door-config-body {
     padding: 1rem;
+    background: var(--secondary-bg);
 }
 
 /* Door Config Footer with Collapse Button */
@@ -1211,4 +1212,97 @@ select.input-field option {
         opacity: 1;
     }
 }
+
+/* Tooltip Styles */
+.info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: var(--primary-bg);
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: help;
+    margin-left: 0.5rem;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.info-icon:hover {
+    background: var(--accent-hover);
+}
+
+.tooltip {
+    position: fixed;
+    bottom: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    background: var(--tertiary-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    width: 300px;
+    max-width: calc(100vw - 2rem);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    box-shadow: var(--shadow-lg);
+    white-space: normal;
+}
+
+.info-icon:hover .tooltip {
+    opacity: 1;
+}
+
+.tooltip-title {
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 0.5rem;
+}
+
+.tooltip-list {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.2rem;
+}
+
+.tooltip-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.tooltip strong {
+    color: var(--accent-color);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.tooltip-section {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tooltip-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.label-with-info {
+    display: flex;
+    align-items: center;
+}
+
 

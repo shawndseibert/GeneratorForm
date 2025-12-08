@@ -615,6 +615,8 @@ function deleteDoor(button) {
             card.remove();
             // Renumber remaining doors
             renumberDoors();
+            // Update quote output
+            autoGenerateQuote();
         }
     });
 }
@@ -1167,16 +1169,16 @@ function copyQuote() {
     
     // Convert CSS classes to inline styles for email - without background colors
     let styledHTML = htmlContent
-        .replace(/<div class="quote-title">/g, '<div style="font-size: 1.4rem; font-weight: 700; color: #4a90e2; text-align: center; margin-bottom: 1.5rem; letter-spacing: 0.5px;">')
-        .replace(/<div class="quote-section">/g, '<div style="margin-bottom: 0.8rem; font-size: 1.1rem; font-weight: 700; color: #5a9fd4; margin-top: 1rem; letter-spacing: 0.3px;">')
-        .replace(/<div class="quote-item">/g, '<div style="margin-bottom: 0.4rem; padding-left: 0.5rem; color: #333333;">')
-        .replace(/<span class="quote-label">/g, '<span style="font-weight: 600; color: #4a90e2;">')
-        .replace(/<span class="quote-value">/g, '<span style="color: #333333;">')
-        .replace(/<div class="quote-separator-main">/g, '<div style="border-top: 2px solid #4a90e2; margin: 1.5rem 0;">')
-        .replace(/<div class="quote-separator-light">/g, '<div style="border-top: 1px solid #cccccc; margin: 1rem 0;">')
-        .replace(/<div class="quote-door-header">/g, '<div style="font-size: 1.2rem; font-weight: 700; color: #4a90e2; margin: 1.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #cccccc;">')
+        .replace(/<div class="quote-title">/g, '<div style="font-size: 1.4rem; font-weight: 700; color: #4a90e2 !important; text-align: center; margin-bottom: 1.5rem; letter-spacing: 0.5px;">')
+        .replace(/<div class="quote-section">/g, '<div style="margin-bottom: 0.8rem; font-size: 1.1rem; font-weight: 700; color: #5a9fd4 !important; margin-top: 1rem; letter-spacing: 0.3px;">')
+        .replace(/<div class="quote-item">/g, '<div style="margin-bottom: 0.4rem; padding-left: 0.5rem; color: #333333 !important;">')
+        .replace(/<span class="quote-label">/g, '<span style="font-weight: 600; color: #4a90e2 !important;">')
+        .replace(/<span class="quote-value">/g, '<span style="color: #333333 !important;">')
+        .replace(/<div class="quote-separator-main">/g, '<div style="border-top: 2px solid #4a90e2 !important; margin: 1.5rem 0;">')
+        .replace(/<div class="quote-separator-light">/g, '<div style="border-top: 1px solid #4a90e2 !important; margin: 1rem 0;">')
+        .replace(/<div class="quote-door-header">/g, '<div style="font-size: 1.2rem; font-weight: 700; color: #4a90e2 !important; margin: 1.5rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 2px solid #4a90e2 !important;">')
         .replace(/<div class="quote-spacer">/g, '<div style="height: 0.3rem;">')
-        .replace(/<div class="quote-text">/g, '<div style="color: #333333; margin-bottom: 0.2rem;">');
+        .replace(/<div class="quote-text">/g, '<div style="color: #333333 !important; margin-bottom: 0.2rem;">');
     
     // Wrap in email-friendly table structure
     const emailHTML = `
@@ -1510,6 +1512,46 @@ function clearAllDoors() {
     });
 }
 
+// Setup tooltip positioning to prevent cutoff
+function setupTooltips() {
+    document.addEventListener('mouseover', (e) => {
+        if (e.target.classList.contains('info-icon')) {
+            const tooltip = e.target.querySelector('.tooltip');
+            if (tooltip) {
+                const iconRect = e.target.getBoundingClientRect();
+                const tooltipRect = tooltip.getBoundingClientRect();
+                
+                // Position above the icon by default
+                let top = iconRect.top - tooltipRect.height - 12;
+                let left = iconRect.left + (iconRect.width / 2) - (tooltipRect.width / 2);
+                
+                // Check if tooltip goes off top of screen
+                if (top < 10) {
+                    // Position below instead
+                    top = iconRect.bottom + 12;
+                }
+                
+                // Check if tooltip goes off left side
+                if (left < 10) {
+                    left = 10;
+                }
+                
+                // Check if tooltip goes off right side
+                if (left + tooltipRect.width > window.innerWidth - 10) {
+                    left = window.innerWidth - tooltipRect.width - 10;
+                }
+                
+                tooltip.style.top = top + 'px';
+                tooltip.style.left = left + 'px';
+            }
+        }
+    });
+}
+
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    setupTooltips();
+});
+
 
