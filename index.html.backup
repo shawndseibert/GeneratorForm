@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Door Quote Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Door Quote Request Generator</h1>
+            <p class="subtitle">Professional Door Specifications</p>
+        </header>
+
+        <main>
+            <form id="quoteForm">
+                <!-- Project Info Section -->
+                <section class="form-section">
+                    <h2>Project Information</h2>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="projectAddress">Address / Location</label>
+                            <input type="text" id="projectAddress" class="input-field" placeholder="123 Main Street, Nashville TN 37207">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Door Configurations Container -->
+                <div id="doorConfigurationsContainer"></div>
+
+                <!-- Add Door Button -->
+                <div class="add-door-section">
+                    <button type="button" class="btn-add-door" onclick="addDoorConfiguration()">
+                        <span class="plus-icon">+</span> Add Door Configuration
+                    </button>
+                </div>
+
+                <!-- Hidden template for door configuration -->
+                <template id="doorConfigTemplate">
+                    <div class="door-config-card">
+                        <div class="door-config-header">
+                            <h3 class="door-config-title">Door Configuration <span class="door-number"></span></h3>
+                            <div class="door-config-actions">
+                                <button type="button" class="btn-icon" onclick="duplicateDoor(this)" title="Duplicate">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1H2z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="btn-icon" onclick="toggleDoorConfig(this)" title="Collapse/Expand">
+                                    <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="btn-icon btn-delete-door" onclick="deleteDoor(this)" title="Delete">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="door-config-summary hidden"></div>
+                        
+                        <div class="door-config-body">
+                            <!-- Door Location -->
+                            <section class="form-section-compact">
+                                <h4>Door Location</h4>
+                                <div class="form-group">
+                                    <input type="text" class="input-field door-location" placeholder="e.g., Downstairs Front Exterior">
+                                </div>
+                            </section>
+
+                            <!-- Door Configuration -->
+                            <section class="form-section-compact">
+                                <h4>Door Configuration</h4>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="doorConfig" class="input-field">
+                                <option value="">Select Configuration</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('doorConfig')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Door Type Section -->
+                <section class="form-section">
+                    <h2>Door Type</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="doorType" class="input-field">
+                                <option value="">Select Door Type</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('doorType')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Door Material Section -->
+                <section class="form-section">
+                    <h2>Door Material</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="doorMaterial" class="input-field">
+                                <option value="">Select Material</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('doorMaterial')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Door Dimensions Section -->
+                <section class="form-section">
+                    <h2>Door Dimensions</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="doorSize" class="input-field">
+                                <option value="">Select Size</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('doorSize')">Manage</button>
+                        </div>
+                    </div>
+                    <div class="custom-dimension">
+                        <label for="customDimension">Or Enter Custom Dimension:</label>
+                        <input type="text" id="customDimension" class="input-field" placeholder='e.g., 36x80 or 3\'0"x6\'8"'>
+                        <span class="dimension-display" id="dimensionDisplay"></span>
+                    </div>
+                    <div class="form-row" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="doorThickness">Door Thickness</label>
+                            <div class="option-group">
+                                <select id="doorThickness" class="input-field">
+                                    <option value="">Select Thickness</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('doorThickness')">Manage</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Door Style Section -->
+                <section class="form-section">
+                    <h2>Door Style</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="doorStyle" class="input-field">
+                                <option value="">Select Style</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('doorStyle')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Glass Configuration Section -->
+                <section class="form-section">
+                    <h2>Glass Configuration</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="glassType" class="input-field">
+                                <option value="">Select Glass Type</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('glassType')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Handing/Swing Section -->
+                <section class="form-section">
+                    <h2>Handing / Swing Direction</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="handingSwing" class="input-field">
+                                <option value="">Select Handing</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('handingSwing')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Jamb Section -->
+                <section class="form-section">
+                    <h2>Jamb / Frame Information</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="jambDepth">Jamb Depth</label>
+                            <div class="option-group">
+                                <select id="jambDepth" class="input-field">
+                                    <option value="">Select Jamb Depth</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('jambDepth')">Manage</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="jambNotes">Jamb Notes</label>
+                        <input type="text" id="jambNotes" class="input-field" placeholder="e.g., Jamb/frame stays — slab-only replacement">
+                    </div>
+                </section>
+
+                <!-- Hinge Specifications Section -->
+                <section class="form-section">
+                    <h2>Hinge Specifications</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hingeCount">Number of Hinges</label>
+                            <select id="hingeCount" class="input-field">
+                                <option value="">Select</option>
+                                <option value="2">2 Hinges</option>
+                                <option value="3" selected>3 Hinges</option>
+                                <option value="4">4 Hinges</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hingeSize">Hinge Size</label>
+                            <div class="option-group">
+                                <select id="hingeSize" class="input-field">
+                                    <option value="">Select Size</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('hingeSize')">Manage</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hingeStyle">Hinge Style</label>
+                            <div class="option-group">
+                                <select id="hingeStyle" class="input-field">
+                                    <option value="">Select Style</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('hingeStyle')">Manage</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="hingeColor">Hinge Color</label>
+                            <div class="option-group">
+                                <select id="hingeColor" class="input-field">
+                                    <option value="">Select Color</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('hingeColor')">Manage</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="hingeLocations">Hinge Locations (from top of slab to top of hinge)</label>
+                        <input type="text" id="hingeLocations" class="input-field" placeholder='e.g., Top: 6-7/8", Middle: 35", Bottom: 63-5/8"'>
+                    </div>
+                    <div class="form-group">
+                        <label for="hingeNotes">Hinge Notes</label>
+                        <input type="text" id="hingeNotes" class="input-field" placeholder="e.g., Must match existing hinge mortises exactly">
+                    </div>
+                </section>
+
+                <!-- Hardware Prep Section -->
+                <section class="form-section">
+                    <h2>Hardware Prep</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lockBore">Lock Bore</label>
+                            <div class="option-group">
+                                <select id="lockBore" class="input-field">
+                                    <option value="">Select</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('lockBore')">Manage</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="backset">Backset</label>
+                            <div class="option-group">
+                                <select id="backset" class="input-field">
+                                    <option value="">Select</option>
+                                </select>
+                                <button type="button" class="btn-manage" onclick="openModal('backset')">Manage</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="deadboltPrep">
+                            <span>Deadbolt Prep Required</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="hardwareNotes">Hardware Prep Notes</label>
+                        <input type="text" id="hardwareNotes" class="input-field" placeholder="e.g., Prepped to re-use existing hardware">
+                    </div>
+                </section>
+
+                <!-- Finish Section -->
+                <section class="form-section">
+                    <h2>Finish</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="doorFinish" class="input-field">
+                                <option value="">Select Finish</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('doorFinish')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Hardware Finish Section -->
+                <section class="form-section">
+                    <h2>Hardware Finish</h2>
+                    <div class="form-group">
+                        <div class="option-group">
+                            <select id="hardwareFinish" class="input-field">
+                                <option value="">Select Hardware Finish</option>
+                            </select>
+                            <button type="button" class="btn-manage" onclick="openModal('hardwareFinish')">Manage</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Additional Notes Section -->
+                <section class="form-section">
+                    <h2>Additional Notes</h2>
+                    <textarea id="additionalNotes" class="input-field textarea" rows="4" placeholder="Enter any additional specifications or requirements..."></textarea>
+                </section>
+
+                <!-- Quantity Section -->
+                <section class="form-section">
+                    <h2>Quantity</h2>
+                    <input type="number" id="quantity" class="input-field" min="1" value="1">
+                </section>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn-primary" onclick="generateQuote()">Generate Quote Request</button>
+                    <button type="button" class="btn-secondary" onclick="resetForm()">Reset Form</button>
+                </div>
+            </form>
+
+            <!-- Generated Quote Display -->
+            <div id="quoteOutput" class="quote-output hidden">
+                <h2>Generated Quote Request</h2>
+                <div id="quoteContent" class="quote-content"></div>
+                <button type="button" class="btn-primary" onclick="copyQuote()">Copy to Clipboard</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Managing Options -->
+    <div id="optionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Manage Options</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="add-option">
+                    <input type="text" id="newOptionInput" class="input-field" placeholder="Enter new option...">
+                    <button type="button" class="btn-primary" onclick="addNewOption()">Add</button>
+                </div>
+                <div class="options-list" id="optionsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
