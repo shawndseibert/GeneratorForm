@@ -9,60 +9,79 @@
 <body>
     <div class="container">
         <header>
-            <h1>Door Quote Request Generator</h1>
-            <p class="subtitle">Professional Door Specifications</p>
+            <div class="header-left">
+                <img src="logo-84.png" alt="84 Logo" class="header-logo-small">
+                <div>
+                    <h1>Door Quote Request Generator</h1>
+                    <p class="subtitle">Professional Door Specifications</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn-secondary" onclick="openSaveConfigDialog()" title="Save Configuration">💾 Save</button>
+                <button type="button" class="btn-secondary" onclick="openLoadConfigDialog()" title="Load Configuration">📂 Load</button>
+            </div>
         </header>
 
         <main>
-            <form id="quoteForm">
-                <!-- Project Info Section -->
-                <section class="form-section">
-                    <h2>Project Information</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="customerName">Customer Name</label>
-                            <input type="text" id="customerName" class="input-field" placeholder="John Smith">
+            <!-- Module Sidebar -->
+            <div class="module-sidebar">
+                <h3>📦 Available Modules</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Click to add sections to your door configuration</p>
+                <div class="module-list" id="moduleList"></div>
+            </div>
+
+            <!-- Main Form Area -->
+            <div class="form-area">
+                <form id="quoteForm">
+                    <!-- Project Info Section -->
+                    <section class="form-section">
+                        <h2>Project Information</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerName">Customer Name</label>
+                                <input type="text" id="customerName" class="input-field" placeholder="John Smith">
+                            </div>
+                            <div class="form-group">
+                                <label for="projectName">Project Name</label>
+                                <input type="text" id="projectName" class="input-field" placeholder="Residential Renovation">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="projectName">Project Name</label>
-                            <input type="text" id="projectName" class="input-field" placeholder="Residential Renovation">
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="projectAddress">Address / Location</label>
+                                <input type="text" id="projectAddress" class="input-field" placeholder="123 Main Street, Nashville TN 37207">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Door Configurations Container -->
+                    <div id="doorConfigurationsContainer"></div>
+
+                    <!-- Add Door Button -->
+                    <div class="add-door-section">
+                        <button type="button" class="btn-add-door" onclick="addDoorConfiguration()">
+                            <span class="plus-icon">+</span> Add Door Configuration
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="resetForm()">Reset All</button>
+                    </div>
+                </form>
+
+                <!-- Generated Quote Display -->
+                <div id="quoteOutput" class="quote-output">
+                    <div class="quote-header-section">
+                        <h2>Live Quote Request Preview</h2>
+                        <div id="quoteWarning" class="quote-warning hidden">
+                            <span class="warning-icon">⚠</span>
+                            <span id="quoteWarningText">Missing required fields</span>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group full-width">
-                            <label for="projectAddress">Address / Location</label>
-                            <input type="text" id="projectAddress" class="input-field" placeholder="123 Main Street, Nashville TN 37207">
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Door Configurations Container -->
-                <div id="doorConfigurationsContainer"></div>
-
-                <!-- Add Door Button -->
-                <div class="add-door-section">
-                    <button type="button" class="btn-add-door" onclick="addDoorConfiguration()">
-                        <span class="plus-icon">+</span> Add Door Configuration
-                    </button>
+                    <div id="quoteContent" class="quote-content"></div>
+                    <button type="button" class="btn-primary" onclick="copyQuote()">Copy to Clipboard</button>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="resetForm()">Reset All</button>
-                </div>
-            </form>
-
-            <!-- Generated Quote Display -->
-            <div id="quoteOutput" class="quote-output">
-                <div class="quote-header-section">
-                    <h2>Live Quote Request Preview</h2>
-                    <div id="quoteWarning" class="quote-warning hidden">
-                        <span class="warning-icon">⚠</span>
-                        <span id="quoteWarningText">Missing required fields</span>
-                    </div>
-                </div>
-                <div id="quoteContent" class="quote-content"></div>
-                <button type="button" class="btn-primary" onclick="copyQuote()">Copy to Clipboard</button>
             </div>
         </main>
     </div>
@@ -71,7 +90,13 @@
     <template id="doorConfigTemplate">
         <div class="door-config-card">
             <div class="door-config-header" onclick="toggleDoorConfig(this.parentElement)">
-                <h3 class="door-config-title">Door Configuration <span class="door-number"></span></h3>
+                <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                    <h3 class="door-config-title">Door Configuration <span class="door-number"></span></h3>
+                    <div class="quantity-control" onclick="event.stopPropagation()">
+                        <label style="font-size: 0.85rem; color: var(--text-secondary); margin-right: 0.5rem;">Qty:</label>
+                        <input type="number" class="door-quantity-input" min="1" value="1" style="width: 60px; padding: 0.3rem; text-align: center;" onchange="autoGenerateQuote()">
+                    </div>
+                </div>
                 <div class="door-config-actions" onclick="event.stopPropagation()">
                     <button type="button" class="btn-icon" onclick="duplicateDoor(this)" title="Duplicate">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -95,472 +120,10 @@
             <div class="door-config-summary hidden"></div>
             
             <div class="door-config-body">
-                <!-- Door Location -->
-                <section class="form-section-compact">
-                    <h4>Door Location</h4>
-                    <div class="form-group">
-                        <input type="text" class="input-field door-location" placeholder="e.g., Downstairs Front Exterior">
-                    </div>
-                </section>
-
-                <!-- Door Configuration -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Door Configuration
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Configuration Types</div>
-                                    <div class="tooltip-section">
-                                        <strong>Slab Only:</strong> Just the door panel, no frame/hardware
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Pre-hung:</strong> Door mounted in frame, ready to install
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Complete Unit:</strong> Everything included - easiest install
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Replacement:</strong> New door for existing frame
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-config-select">
-                                <option value="">Select Configuration</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('doorConfig')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Door Type -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Door Type
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Door Type Guide</div>
-                                    <div class="tooltip-section">
-                                        <strong>Interior:</strong> Bedroom, bathroom, closet doors
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Exterior:</strong> Weatherproof, insulated, security features
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Entry:</strong> Front door, decorative, high security
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>French:</strong> Double doors with glass panels
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-type-select">
-                                <option value="">Select Door Type</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('doorType')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Door Material -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Door Material
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Material Guide</div>
-                                    <div class="tooltip-section">
-                                        <strong>Wood:</strong> Classic, beautiful, paintable/stainable. Requires maintenance.
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>MDF:</strong> Budget-friendly, smooth finish, paint-ready. Not for exterior.
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Steel:</strong> Strong, secure, energy-efficient. Best for exterior entry.
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Fiberglass:</strong> Durable, low-maintenance, resists warping. Great for exterior.
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Composite:</strong> Engineered material, stable, good insulation.
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-material-select">
-                                <option value="">Select Material</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('doorMaterial')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Door Dimensions -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Door Dimensions
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Common Door Sizes</div>
-                                    <strong>Interior Doors:</strong>
-                                    <ul class="tooltip-list">
-                                        <li>2'6"x6'8" (30"x80") - Bathrooms</li>
-                                        <li>2'8"x6'8" (32"x80") - Standard</li>
-                                        <li>3'0"x6'8" (36"x80") - Most common</li>
-                                    </ul>
-                                    <strong>Exterior Doors:</strong>
-                                    <ul class="tooltip-list">
-                                        <li>3'0"x6'8" (36"x80") - Standard entry</li>
-                                        <li>3'0"x8'0" (36"x96") - Tall entry</li>
-                                        <li>2'6"x6'8" (30"x80") - Back/side doors</li>
-                                    </ul>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-size-select">
-                                <option value="">Select Size</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('doorSize')">Manage</button>
-                        </div>
-                    </div>
-                    <div class="custom-dimension">
-                        <label>Or Enter Custom Dimension:</label>
-                        <input type="text" class="input-field door-custom-dimension" placeholder='e.g., 36x80 or 3\'0"x6\'8"'>
-                        <span class="dimension-display"></span>
-                    </div>
-                    <div class="form-row" style="margin-top: 1rem;">
-                        <div class="form-group">
-                            <label class="label-with-info">Door Thickness
-                                <span class="info-icon">i
-                                    <span class="tooltip">
-                                        <div class="tooltip-title">Standard Thicknesses</div>
-                                        <ul class="tooltip-list">
-                                            <li><strong>1-3/8"</strong> - Interior doors (most common)</li>
-                                            <li><strong>1-3/4"</strong> - Exterior doors (standard)</li>
-                                            <li><strong>2-1/4"</strong> - Heavy-duty exterior</li>
-                                        </ul>
-                                    </span>
-                                </span>
-                            </label>
-                            <div class="option-group">
-                                <select class="input-field door-thickness-select">
-                                    <option value="">Select Thickness</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('doorThickness')">Manage</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Door Style -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Door Style
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Popular Styles</div>
-                                    <div class="tooltip-section">
-                                        <strong>Shaker:</strong> Simple, clean lines - timeless design
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Raised Panel:</strong> Traditional, adds depth and character
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Flat/Flush:</strong> Modern, minimalist look
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Craftsman:</strong> Horizontal rails, distinctive character
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Mission:</strong> Arts & Crafts style with vertical panels
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-style-select">
-                                <option value="">Select Style</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('doorStyle')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Glass Configuration -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Glass Configuration
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Glass Options</div>
-                                    <div class="tooltip-section">
-                                        <strong>Clear:</strong> Maximum light, less privacy
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Frosted:</strong> Privacy with natural light
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Decorative:</strong> Etched or textured patterns
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Low-E:</strong> Energy-efficient, UV protection
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Tempered:</strong> Safety glass, required for entry doors
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-glass-select">
-                                <option value="">Select Glass Type</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('glassType')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Handing/Swing -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Handing / Swing Direction
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">How to Determine Handing</div>
-                                    <div style="margin-bottom: 0.75rem; color: var(--text-secondary);">Stand on the side where hinges are NOT visible:</div>
-                                    <div class="tooltip-section">
-                                        <strong>Left Hand (LH):</strong> Hinges on left, opens toward you
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Right Hand (RH):</strong> Hinges on right, opens toward you
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>LH Reverse:</strong> Hinges left, opens away
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>RH Reverse:</strong> Hinges right, opens away
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-handing-select">
-                                <option value="">Select Handing</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('handingSwing')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Jamb -->
-                <section class="form-section-compact">
-                    <h4>Jamb / Frame Information</h4>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="label-with-info">Jamb Depth
-                                <span class="info-icon">i
-                                    <span class="tooltip">
-                                        <div class="tooltip-title">Common Jamb Depths</div>
-                                        <ul class="tooltip-list">
-                                            <li><strong>4-9/16"</strong> - 2x4 wall (most common interior)</li>
-                                            <li><strong>6-9/16"</strong> - 2x6 wall (exterior, insulated)</li>
-                                            <li>Match existing wall thickness</li>
-                                        </ul>
-                                    </span>
-                                </span>
-                            </label>
-                            <div class="option-group">
-                                <select class="input-field door-jamb-depth-select">
-                                    <option value="">Select Jamb Depth</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('jambDepth')">Manage</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Jamb Notes</label>
-                        <input type="text" class="input-field door-jamb-notes" placeholder="e.g., Jamb/frame stays — slab-only replacement">
-                    </div>
-                </section>
-
-                <!-- Hinge Specifications -->
-                <section class="form-section-compact">
-                    <h4>
-                        <span class="label-with-info">
-                            Hinge Specifications
-                            <span class="info-icon">i
-                                <span class="tooltip">
-                                    <div class="tooltip-title">Hinge Standards</div>
-                                    <div class="tooltip-section">
-                                        <strong>Number:</strong> 3 hinges standard for doors up to 7', 4 for taller
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Size:</strong> 3.5" × 3.5" interior, 4" × 4" exterior entry
-                                    </div>
-                                    <div class="tooltip-section">
-                                        <strong>Location:</strong> Typically 7" from top, 11" from bottom, middle centered
-                                    </div>
-                                </span>
-                            </span>
-                        </span>
-                    </h4>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Number of Hinges</label>
-                            <select class="input-field door-hinge-count">
-                                <option value="">Select (3 assumed for pre-hung)</option>
-                                <option value="2">2 Hinges</option>
-                                <option value="3">3 Hinges</option>
-                                <option value="4">4 Hinges</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Hinge Size</label>
-                            <div class="option-group">
-                                <select class="input-field door-hinge-size-select">
-                                    <option value="">Select Size</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('hingeSize')">Manage</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Hinge Style</label>
-                            <div class="option-group">
-                                <select class="input-field door-hinge-style-select">
-                                    <option value="">Select Style</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('hingeStyle')">Manage</button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Hinge Color</label>
-                            <div class="option-group">
-                                <select class="input-field door-hinge-color-select">
-                                    <option value="">Select Color</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('hingeColor')">Manage</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Hinge Locations (from top of slab to top of hinge)</label>
-                        <input type="text" class="input-field door-hinge-locations" placeholder='e.g., Top: 6-7/8", Middle: 35", Bottom: 63-5/8"'>
-                    </div>
-                    <div class="form-group">
-                        <label>Hinge Notes</label>
-                        <input type="text" class="input-field door-hinge-notes" placeholder="e.g., Must match existing hinge mortises exactly">
-                    </div>
-                </section>
-
-                <!-- Hardware Prep -->
-                <section class="form-section-compact">
-                    <h4>Hardware Prep</h4>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Lock Bore</label>
-                            <div class="option-group">
-                                <select class="input-field door-lock-bore-select">
-                                    <option value="">Select</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('lockBore')">Manage</button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Backset</label>
-                            <div class="option-group">
-                                <select class="input-field door-backset-select">
-                                    <option value="">Select</option>
-                                </select>
-                                <button type="button" class="btn-manage" onclick="openModal('backset')">Manage</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" class="door-deadbolt-prep">
-                            <span>Deadbolt Prep Required</span>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>Hardware Prep Notes</label>
-                        <input type="text" class="input-field door-hardware-notes" placeholder="e.g., Prepped to re-use existing hardware">
-                    </div>
-                </section>
-
-                <!-- Finish -->
-                <section class="form-section-compact">
-                    <h4>Finish</h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-finish-select">
-                                <option value="">Select Finish</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('doorFinish')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Hardware Finish -->
-                <section class="form-section-compact">
-                    <h4>Hardware Finish</h4>
-                    <div class="form-group">
-                        <div class="option-group">
-                            <select class="input-field door-hardware-finish-select">
-                                <option value="">Select Hardware Finish</option>
-                            </select>
-                            <button type="button" class="btn-manage" onclick="openModal('hardwareFinish')">Manage</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Additional Notes -->
-                <section class="form-section-compact">
-                    <h4>Additional Notes</h4>
-                    <textarea class="input-field textarea door-additional-notes" rows="3" placeholder="Enter any additional specifications..."></textarea>
-                </section>
-
-                <!-- Quantity -->
-                <section class="form-section-compact">
-                    <h4>Quantity</h4>
-                    <input type="number" class="input-field door-quantity" min="1" value="1">
-                </section>
-
-                <!-- Bottom Collapse Button -->
-                <div class="door-config-footer">
-                    <button type="button" class="btn-collapse-footer" onclick="toggleDoorConfig(this.closest('.door-config-card'))">
-                        <span>Collapse Door Configuration</span>
-                        <svg class="collapse-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-                        </svg>
-                    </button>
+                <!-- Modules will be added here dynamically -->
+                <div class="empty-state" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">👈 Click modules from the sidebar to add them</p>
+                    <p style="font-size: 0.9rem;">Build your door configuration step by step</p>
                 </div>
             </div>
         </div>
@@ -618,5 +181,6 @@
     </div>
 
     <script src="app.js"></script>
+    <script src="drag-drop.js"></script>
 </body>
 </html>
